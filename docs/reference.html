@@ -1,0 +1,2494 @@
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+
+	
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "router"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="#overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="#index">Index</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="overview" class="toggleVisible">
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview</h2>
+				<p>
+&#34;router&#34; is a Go package for peer-peer pub/sub message passing.
+The basic usage is to attach a send channel to an id in router to send messages,
+and attach a recv channel to an id to receive messages. If these 2 ids match,
+the messages from send channel will be &#34;routed&#34; to recv channel, e.g.
+</p>
+<pre>rot := router.New(...)
+chan1 := make(chan string)
+chan2 := make(chan string)
+chan3 := make(chan string)
+rot.AttachSendChan(PathID(&#34;/sports/basketball&#34;), chan1)
+rot.AttachRecvChan(PathID(&#34;/sports/basketball&#34;), chan2)
+rot.AttachRecvChan(PathID(&#34;/sports/*&#34;), chan3)
+</pre>
+<p>
+We can use integers, strings, pathnames, or structs as Ids in router (maybe regex ids
+and tuple id in future).
+</p>
+<p>
+we can connect two routers so that channels attached to router1 can communicate with
+channels attached to router2 transparently.
+</p>
+
+			</div>
+		</div>
+		
+	
+		<h2 id="index">Index</h2>
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+		<div id="manual-nav">
+			<dl>
+			
+				<dd><a href="#constants">Constants</a></dd>
+			
+			
+				<dd><a href="#variables">Variables</a></dd>
+			
+			
+				
+				<dd><a href="#Broadcast">func Broadcast(v reflect.Value, recvers []*RoutedChan)</a></dd>
+			
+				
+				<dd><a href="#ExportedId">func ExportedId(id Id) bool</a></dd>
+			
+				
+				<dd><a href="#KeepLatestBroadcast">func KeepLatestBroadcast(v reflect.Value, recvers []*RoutedChan)</a></dd>
+			
+				
+				<dd><a href="#MemberString">func MemberString(m int) string</a></dd>
+			
+				
+				<dd><a href="#ScopeString">func ScopeString(s int) string</a></dd>
+			
+			
+				
+				<dd><a href="#BindEvent">type BindEvent</a></dd>
+				
+				
+			
+				
+				<dd><a href="#BindEventType">type BindEventType</a></dd>
+				
+				
+			
+				
+				<dd><a href="#ChanDirection">type ChanDirection</a></dd>
+				
+				
+			
+				
+				<dd><a href="#ChanInfo">type ChanInfo</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#ChanInfo.String">func (ici ChanInfo) String() string</a></dd>
+				
+			
+				
+				<dd><a href="#ChanInfoMsg">type ChanInfoMsg</a></dd>
+				
+				
+			
+				
+				<dd><a href="#ChanReadyInfo">type ChanReadyInfo</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#ChanReadyInfo.String">func (cri ChanReadyInfo) String() string</a></dd>
+				
+			
+				
+				<dd><a href="#ChanState">type ChanState</a></dd>
+				
+				
+			
+				
+				<dd><a href="#Channel">type Channel</a></dd>
+				
+				
+			
+				
+				<dd><a href="#ConnInfoMsg">type ConnInfoMsg</a></dd>
+				
+				
+			
+				
+				<dd><a href="#ConnReadyMsg">type ConnReadyMsg</a></dd>
+				
+				
+			
+				
+				<dd><a href="#Demarshaler">type Demarshaler</a></dd>
+				
+				
+			
+				
+				<dd><a href="#DispatchFunc">type DispatchFunc</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DispatchFunc.Dispatch">func (f DispatchFunc) Dispatch(v reflect.Value, recvers []*RoutedChan)</a></dd>
+				
+			
+				
+				<dd><a href="#DispatchPolicy">type DispatchPolicy</a></dd>
+				
+				
+			
+				
+				<dd><a href="#Dispatcher">type Dispatcher</a></dd>
+				
+				
+			
+				
+				<dd><a href="#FaultRaiser">type FaultRaiser</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#NewFaultRaiser">func NewFaultRaiser(id Id, r Router, src string) *FaultRaiser</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#FaultRaiser.Close">func (l *FaultRaiser) Close()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#FaultRaiser.Init">func (l *FaultRaiser) Init(id Id, r Router, src string) *FaultRaiser</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#FaultRaiser.Raise">func (r *FaultRaiser) Raise(msg error)</a></dd>
+				
+			
+				
+				<dd><a href="#FaultRecord">type FaultRecord</a></dd>
+				
+				
+			
+				
+				<dd><a href="#FlowControlPolicy">type FlowControlPolicy</a></dd>
+				
+				
+			
+				
+				<dd><a href="#FlowRecver">type FlowRecver</a></dd>
+				
+				
+			
+				
+				<dd><a href="#FlowSender">type FlowSender</a></dd>
+				
+				
+			
+				
+				<dd><a href="#Id">type Id</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#IntID">func IntID(args ...interface{}) Id</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MsgID">func MsgID(args ...interface{}) Id</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#PathID">func PathID(args ...interface{}) Id</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StrID">func StrID(args ...interface{}) Id</a></dd>
+				
+				
+			
+				
+				<dd><a href="#IdFilter">type IdFilter</a></dd>
+				
+				
+			
+				
+				<dd><a href="#IdTranslator">type IdTranslator</a></dd>
+				
+				
+			
+				
+				<dd><a href="#IntId">type IntId</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#IntId.Clone">func (id IntId) Clone(args ...int) (nnid Id, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#IntId.Key">func (id IntId) Key() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#IntId.Match">func (id1 IntId) Match(id2 Id) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#IntId.MatchType">func (id IntId) MatchType() MatchType</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#IntId.Member">func (id IntId) Member() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#IntId.Scope">func (id IntId) Scope() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#IntId.String">func (id IntId) String() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#IntId.SysID">func (id IntId) SysID(indx int, args ...int) (ssid Id, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#IntId.SysIdIndex">func (id IntId) SysIdIndex() int</a></dd>
+				
+			
+				
+				<dd><a href="#LogPriority">type LogPriority</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#LogPriority.String">func (lp LogPriority) String() string</a></dd>
+				
+			
+				
+				<dd><a href="#LogRecord">type LogRecord</a></dd>
+				
+				
+			
+				
+				<dd><a href="#LogSink">type LogSink</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#NewLogSink">func NewLogSink(id Id, r Router) *LogSink</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#LogSink.Close">func (l *LogSink) Close()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#LogSink.Init">func (l *LogSink) Init(id Id, r Router) *LogSink</a></dd>
+				
+			
+				
+				<dd><a href="#Logger">type Logger</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#NewLogger">func NewLogger(id Id, r Router, src string) *Logger</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Logger.Close">func (l *Logger) Close()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Logger.Init">func (l *Logger) Init(id Id, r Router, src string) *Logger</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Logger.Log">func (l *Logger) Log(p LogPriority, msg interface{})</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Logger.LogError">func (l *Logger) LogError(err error)</a></dd>
+				
+			
+				
+				<dd><a href="#Marshaler">type Marshaler</a></dd>
+				
+				
+			
+				
+				<dd><a href="#MarshalingPolicy">type MarshalingPolicy</a></dd>
+				
+				
+			
+				
+				<dd><a href="#MatchType">type MatchType</a></dd>
+				
+				
+			
+				
+				<dd><a href="#MsgId">type MsgId</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MsgId.Clone">func (id MsgId) Clone(args ...int) (nnid Id, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MsgId.Key">func (id MsgId) Key() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MsgId.Match">func (id1 MsgId) Match(id2 Id) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MsgId.MatchType">func (id MsgId) MatchType() MatchType</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MsgId.Member">func (id MsgId) Member() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MsgId.Scope">func (id MsgId) Scope() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MsgId.String">func (id MsgId) String() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MsgId.SysID">func (id MsgId) SysID(indx int, args ...int) (ssid Id, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MsgId.SysIdIndex">func (id MsgId) SysIdIndex() int</a></dd>
+				
+			
+				
+				<dd><a href="#MsgTag">type MsgTag</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MsgTag.String">func (t MsgTag) String() string</a></dd>
+				
+			
+				
+				<dd><a href="#PathId">type PathId</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#PathId.Clone">func (id PathId) Clone(args ...int) (nnid Id, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#PathId.Key">func (id PathId) Key() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#PathId.Match">func (id1 PathId) Match(id2 Id) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#PathId.MatchType">func (id PathId) MatchType() MatchType</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#PathId.Member">func (id PathId) Member() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#PathId.Scope">func (id PathId) Scope() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#PathId.String">func (id PathId) String() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#PathId.SysID">func (id PathId) SysID(indx int, args ...int) (ssid Id, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#PathId.SysIdIndex">func (id PathId) SysIdIndex() int</a></dd>
+				
+			
+				
+				<dd><a href="#PolicyFunc">type PolicyFunc</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#PolicyFunc.NewDispatcher">func (f PolicyFunc) NewDispatcher() Dispatcher</a></dd>
+				
+			
+				
+				<dd><a href="#Proxy">type Proxy</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#NewProxy">func NewProxy(r Router, name string, f IdFilter, t IdTranslator) Proxy</a></dd>
+				
+				
+			
+				
+				<dd><a href="#RandomDispatcher">type RandomDispatcher</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#NewRandomDispatcher">func NewRandomDispatcher() *RandomDispatcher</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#RandomDispatcher.Dispatch">func (rd *RandomDispatcher) Dispatch(v reflect.Value, recvers []*RoutedChan)</a></dd>
+				
+			
+				
+				<dd><a href="#RecvChan">type RecvChan</a></dd>
+				
+				
+			
+				
+				<dd><a href="#Recver">type Recver</a></dd>
+				
+				
+			
+				
+				<dd><a href="#Roundrobin">type Roundrobin</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#NewRoundrobin">func NewRoundrobin() *Roundrobin</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Roundrobin.Dispatch">func (r *Roundrobin) Dispatch(v reflect.Value, recvers []*RoutedChan)</a></dd>
+				
+			
+				
+				<dd><a href="#RoutedChan">type RoutedChan</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#RoutedChan.Close">func (e *RoutedChan) Close()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#RoutedChan.Detach">func (e *RoutedChan) Detach()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#RoutedChan.Interface">func (e *RoutedChan) Interface() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#RoutedChan.NumPeers">func (e *RoutedChan) NumPeers() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#RoutedChan.Peers">func (e *RoutedChan) Peers() (copySet []*RoutedChan)</a></dd>
+				
+			
+				
+				<dd><a href="#Router">type Router</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#New">func New(seedId Id, bufSize int, disp DispatchPolicy, args ...interface{}) Router</a></dd>
+				
+				
+			
+				
+				<dd><a href="#SendChan">type SendChan</a></dd>
+				
+				
+			
+				
+				<dd><a href="#Sender">type Sender</a></dd>
+				
+				
+			
+				
+				<dd><a href="#StrId">type StrId</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StrId.Clone">func (id StrId) Clone(args ...int) (nnid Id, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StrId.Key">func (id StrId) Key() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StrId.Match">func (id1 StrId) Match(id2 Id) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StrId.MatchType">func (id StrId) MatchType() MatchType</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StrId.Member">func (id StrId) Member() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StrId.Scope">func (id StrId) Scope() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StrId.String">func (id StrId) String() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StrId.SysID">func (id StrId) SysID(indx int, args ...int) (ssid Id, err error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StrId.SysIdIndex">func (id StrId) SysIdIndex() int</a></dd>
+				
+			
+				
+				<dd><a href="#WindowFlowControlPolicy">type WindowFlowControlPolicy</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#WindowFlowControlPolicy.NewFlowRecver">func (wfc WindowFlowControlPolicy) NewFlowRecver(ch Channel, ack func(int), args ...interface{}) (FlowRecver, error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#WindowFlowControlPolicy.NewFlowSender">func (wfc WindowFlowControlPolicy) NewFlowSender(ch Channel, args ...interface{}) (FlowSender, error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#WindowFlowControlPolicy.String">func (wfc WindowFlowControlPolicy) String() string</a></dd>
+				
+			
+				
+				<dd><a href="#XOnOffFlowControlPolicy">type XOnOffFlowControlPolicy</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#XOnOffFlowControlPolicy.NewFlowRecver">func (fcp *XOnOffFlowControlPolicy) NewFlowRecver(ch Channel, ack func(int), args ...interface{}) (FlowRecver, error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#XOnOffFlowControlPolicy.NewFlowSender">func (fcp *XOnOffFlowControlPolicy) NewFlowSender(ch Channel, args ...interface{}) (FlowSender, error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#XOnOffFlowControlPolicy.String">func (fcp *XOnOffFlowControlPolicy) String() string</a></dd>
+				
+			
+			
+		</dl>
+
+		
+
+		
+			<h4>Package files</h4>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="/target/chans.go">chans.go</a>
+			
+				<a href="/target/chanset.go">chanset.go</a>
+			
+				<a href="/target/dispatcher.go">dispatcher.go</a>
+			
+				<a href="/target/filtrans.go">filtrans.go</a>
+			
+				<a href="/target/flowctrl.go">flowctrl.go</a>
+			
+				<a href="/target/id.go">id.go</a>
+			
+				<a href="/target/logfault.go">logfault.go</a>
+			
+				<a href="/target/marshaler.go">marshaler.go</a>
+			
+				<a href="/target/msg.go">msg.go</a>
+			
+				<a href="/target/notifier.go">notifier.go</a>
+			
+				<a href="/target/proxy.go">proxy.go</a>
+			
+				<a href="/target/routedchan.go">routedchan.go</a>
+			
+				<a href="/target/router.go">router.go</a>
+			
+				<a href="/target/stream.go">stream.go</a>
+			
+			</span>
+			</p>
+		
+	
+		
+			<h2 id="constants">Constants</h2>
+			
+				<pre>const (
+    MemberLocal  = iota <span class="comment">//peers (send chans and recv chans) are from the same router</span>
+    MemberRemote        <span class="comment">//peers (send chans and recv chans) are from diff routers</span>
+    NumMembership
+)</pre>
+				<p>
+Membership identifies whether communicating peers (send chans and recv chans) are from the same router or diff routers
+</p>
+
+			
+				<pre>const (
+    ScopeGlobal = iota <span class="comment">// send to or recv from both local and remote peers</span>
+    ScopeRemote        <span class="comment">// send to or recv from remote peers</span>
+    ScopeLocal         <span class="comment">// send to or recv from local peers</span>
+    NumScope
+)</pre>
+				<p>
+Scope is the scope to publish/subscribe (or send/recv) msgs
+</p>
+
+			
+				<pre>const (
+    ConnId    = iota <span class="comment">//msgs for router connection</span>
+    DisconnId        <span class="comment">//msgs for router disconnection</span>
+    ErrorId          <span class="comment">//msgs sent when one side detect errors</span>
+    ReadyId          <span class="comment">//msgs sent when router&#39;s chans ready to recv more msgs</span>
+    PubId            <span class="comment">//send new publications (set&lt;id, chan type info&gt;)</span>
+    UnPubId          <span class="comment">//remove publications from connected routers</span>
+    SubId            <span class="comment">//send new subscriptions (set&lt;id, chan type info&gt;)</span>
+    UnSubId          <span class="comment">//remove subscriptions from connected routers</span>
+    NumSysIds
+)</pre>
+				<p>
+Indices for sys msgs, used for creating SysIds
+</p>
+
+			
+				<pre>const (
+    RouterLogId = NumSysIds + iota
+    RouterFaultId
+    NumSysInternalIds
+)</pre>
+				<p>
+Some system level internal ids (for router internal logging and fault reporting)
+</p>
+
+			
+				<pre>const (
+    DefLogBufSize      = 256
+    DefDataChanBufSize = 32
+    DefCmdChanBufSize  = 64
+    UnlimitedBuffer    = -1
+)</pre>
+				<p>
+Default size settings in router
+</p>
+
+			
+		
+		
+			<h2 id="variables">Variables</h2>
+			
+				<pre>var IntSysIdBase int = -10101 <span class="comment">//Base value for SysIds of IntId</span>
+</pre>
+				<p>
+define 8 system msg ids
+</p>
+
+			
+				<pre>var PathSysIdBase string = &#34;/10101&#34; <span class="comment">//Base value for SysIds of PathId</span>
+</pre>
+				<p>
+define 8 system msg ids
+</p>
+
+			
+				<pre>var StrSysIdBase string = &#34;-10101&#34; <span class="comment">//Base value for SysIds of StrId</span>
+</pre>
+				<p>
+define 8 system msg ids
+</p>
+
+			
+		
+		
+			
+			
+			<h2 id="Broadcast">func <a href="/target/dispatcher.go?s=1208:1262#L42">Broadcast</a></h2>
+			<pre>func Broadcast(v reflect.Value, recvers []*RoutedChan)</pre>
+			<p>
+Simple broadcast is a plain function
+</p>
+
+			
+		
+			
+			
+			<h2 id="ExportedId">func <a href="/target/id.go?s=3457:3484#L124">ExportedId</a></h2>
+			<pre>func ExportedId(id Id) bool</pre>
+			<p>
+A function used as predicate in router.idsForSend()/idsForRecv() to find all ids in a router&#39;s
+namespace which are exported to outside
+</p>
+
+			
+		
+			
+			
+			<h2 id="KeepLatestBroadcast">func <a href="/target/dispatcher.go?s=1591:1655#L52">KeepLatestBroadcast</a></h2>
+			<pre>func KeepLatestBroadcast(v reflect.Value, recvers []*RoutedChan)</pre>
+			<p>
+KeepLastBroadcast never block. if running out of Chan buffer, drop old items and keep the latest items
+</p>
+
+			
+		
+			
+			
+			<h2 id="MemberString">func <a href="/target/id.go?s=492:523#L13">MemberString</a></h2>
+			<pre>func MemberString(m int) string</pre>
+			<p>
+return the string values of membership
+</p>
+
+			
+		
+			
+			
+			<h2 id="ScopeString">func <a href="/target/id.go?s=958:988#L32">ScopeString</a></h2>
+			<pre>func ScopeString(s int) string</pre>
+			<p>
+return string values of Scope
+</p>
+
+			
+		
+		
+			
+			
+			<h2 id="BindEvent">type <a href="/target/msg.go?s=1903:1977#L74">BindEvent</a></h2>
+			<pre>type BindEvent struct {
+    Type  BindEventType
+    Count int <span class="comment">//total attached</span>
+}</pre>
+			<p>
+a message struct containing information for peer (sender/recver) binding/connection.
+sent by router whenever peer attached or detached.
+</p>
+<pre>Type:  the type of event just happened: PeerAttach/PeerDetach/EndOfData
+Count: how many peers are still bound now
+</pre>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="BindEventType">type <a href="/target/msg.go?s=1547:1570#L62">BindEventType</a></h2>
+			<pre>type BindEventType int8</pre>
+			
+
+			
+				<pre>const (
+    PeerAttach BindEventType = iota
+    PeerDetach
+    EndOfData
+)</pre>
+				
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="ChanDirection">type <a href="/target/routedchan.go?s=123:145#L3">ChanDirection</a></h2>
+			<pre>type ChanDirection int</pre>
+			
+
+			
+				<pre>const (
+    Send ChanDirection = iota
+    Recv
+)</pre>
+				
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="ChanInfo">type <a href="/target/msg.go?s=352:440#L10">ChanInfo</a></h2>
+			<pre>type ChanInfo struct {
+    Id       Id
+    ChanType reflect.Type
+    ElemType *chanElemTypeData
+}</pre>
+			<p>
+a message struct holding information about id and its associated ChanType
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="ChanInfo.String">func (ChanInfo) <a href="/target/msg.go?s=442:477#L16">String</a></h3>
+				<pre>func (ici ChanInfo) String() string</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="ChanInfoMsg">type <a href="/target/msg.go?s=229:274#L5">ChanInfoMsg</a></h2>
+			<pre>type ChanInfoMsg struct {
+    Info []*ChanInfo
+}</pre>
+			<p>
+a message struct for propagating router&#39;s namespace changes (chan attachments or detachments)
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="ChanReadyInfo">type <a href="/target/msg.go?s=1345:1397#L49">ChanReadyInfo</a></h2>
+			<pre>type ChanReadyInfo struct {
+    Id     Id
+    Credit int
+}</pre>
+			<p>
+recver-router notify sender-router which channel are ready to recv how many msgs
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="ChanReadyInfo.String">func (ChanReadyInfo) <a href="/target/msg.go?s=1399:1439#L54">String</a></h3>
+				<pre>func (cri ChanReadyInfo) String() string</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="ChanState">type <a href="/target/chans.go?s=790:900#L33">ChanState</a></h2>
+			<pre>type ChanState interface {
+    Type() reflect.Type
+    Interface() interface{}
+    IsNil() bool
+    Cap() int
+    Len() int
+}</pre>
+			<p>
+basic chan state
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="Channel">type <a href="/target/chans.go?s=368:421#L11">Channel</a></h2>
+			<pre>type Channel interface {
+    ChanState
+    Sender
+    Recver
+}</pre>
+			<p>
+Channel interface defines functional api of Go&#39;s channel:
+based on reflect.Value&#39;s channel related method set
+allow programming &#34;generic&#34; channels with reflect.Value as msgs
+add some utility Channel types
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="ConnInfoMsg">type <a href="/target/msg.go?s=1142:1260#L41">ConnInfoMsg</a></h2>
+			<pre>type ConnInfoMsg struct {
+    ConnInfo string
+    Error    string
+    Id       Id
+    Type     string <span class="comment">//async/flowControlled/raw</span>
+}</pre>
+			<p>
+a message struct containing information about remote router connection
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="ConnReadyMsg">type <a href="/target/msg.go?s=1494:1545#L58">ConnReadyMsg</a></h2>
+			<pre>type ConnReadyMsg struct {
+    Info []*ChanReadyInfo
+}</pre>
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="Demarshaler">type <a href="/target/marshaler.go?s=402:462#L14">Demarshaler</a></h2>
+			<pre>type Demarshaler interface {
+    Demarshal(interface{}) error
+}</pre>
+			<p>
+the common interface of all demarshaler such as GobDemarshaler and JsonDemarshaler
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="DispatchFunc">type <a href="/target/dispatcher.go?s=806:868#L24">DispatchFunc</a></h2>
+			<pre>type DispatchFunc func(v reflect.Value, recvers []*RoutedChan)</pre>
+			<p>
+DispatchFunc is a wrapper to convert a plain function into a dispatcher
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="DispatchFunc.Dispatch">func (DispatchFunc) <a href="/target/dispatcher.go?s=870:940#L26">Dispatch</a></h3>
+				<pre>func (f DispatchFunc) Dispatch(v reflect.Value, recvers []*RoutedChan)</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="DispatchPolicy">type <a href="/target/dispatcher.go?s=532:593#L14">DispatchPolicy</a></h2>
+			<pre>type DispatchPolicy interface {
+    NewDispatcher() Dispatcher
+}</pre>
+			<p>
+The programming of Dispatchers:
+1. do not depend on specific chan types
+2. messages sent are represented as reflect.Value
+3. receivers are array of RoutedChans with Channel interface of Send()/Recv()/...
+</p>
+<p>
+DispatchPolicy is used to generate concrete dispatcher instances.
+For the kind of dispatcher which has no internal state, the same instance
+can be returned.
+</p>
+
+
+			
+
+			
+				<pre>var BroadcastPolicy DispatchPolicy = PolicyFunc(func() Dispatcher { return DispatchFunc(Broadcast) })</pre>
+				<p>
+BroadcastPolicy is used to generate broadcast dispatcher instances
+</p>
+
+			
+				<pre>var KeepLatestBroadcastPolicy DispatchPolicy = PolicyFunc(func() Dispatcher { return DispatchFunc(KeepLatestBroadcast) })</pre>
+				<p>
+KeepLatestBroadcastPolicy is used to generate KeepLatest broadcast dispatcher instances
+</p>
+
+			
+				<pre>var RandomPolicy DispatchPolicy = PolicyFunc(func() Dispatcher { return NewRandomDispatcher() })</pre>
+				<p>
+RandomPolicy is used to generate random dispatchers
+</p>
+
+			
+				<pre>var RoundRobinPolicy DispatchPolicy = PolicyFunc(func() Dispatcher { return NewRoundrobin() })</pre>
+				<p>
+RoundRobinPolicy is ued to generate roundrobin dispatchers
+</p>
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="Dispatcher">type <a href="/target/dispatcher.go?s=651:730#L19">Dispatcher</a></h2>
+			<pre>type Dispatcher interface {
+    Dispatch(v reflect.Value, recvers []*RoutedChan)
+}</pre>
+			<p>
+Dispatcher is the common interface of all dispatchers
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="FaultRaiser">type <a href="/target/logfault.go?s=6590:6680#L262">FaultRaiser</a></h2>
+			<pre>type FaultRaiser struct {
+    sync.Mutex
+    <span class="comment">// contains filtered or unexported fields</span>
+}</pre>
+			<p>
+FaultRaiser can be embedded into user structs/ types, which then can call Raise() directly
+</p>
+
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="NewFaultRaiser">func <a href="/target/logfault.go?s=6750:6811#L269">NewFaultRaiser</a></h3>
+				<pre>func NewFaultRaiser(id Id, r Router, src string) *FaultRaiser</pre>
+				<p>
+create a new FaultRaiser to send FaultRecords to id in router &#34;r&#34;
+</p>
+
+				
+			
+
+			
+				
+				<h3 id="FaultRaiser.Close">func (*FaultRaiser) <a href="/target/logfault.go?s=7085:7114#L283">Close</a></h3>
+				<pre>func (l *FaultRaiser) Close()</pre>
+				
+				
+				
+			
+				
+				<h3 id="FaultRaiser.Init">func (*FaultRaiser) <a href="/target/logfault.go?s=6859:6927#L273">Init</a></h3>
+				<pre>func (l *FaultRaiser) Init(id Id, r Router, src string) *FaultRaiser</pre>
+				
+				
+				
+			
+				
+				<h3 id="FaultRaiser.Raise">func (*FaultRaiser) <a href="/target/logfault.go?s=7293:7331#L294">Raise</a></h3>
+				<pre>func (r *FaultRaiser) Raise(msg error)</pre>
+				<p>
+raise a fault - send a FaultRecord to faultId in router
+</p>
+
+				
+				
+			
+		
+			
+			
+			<h2 id="FaultRecord">type <a href="/target/logfault.go?s=5198:5277#L210">FaultRecord</a></h2>
+			<pre>type FaultRecord struct {
+    Source    string
+    Info      error
+    Timestamp int64
+}</pre>
+			<p>
+FaultRecord records some details about fault
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="FlowControlPolicy">type <a href="/target/flowctrl.go?s=704:964#L16">FlowControlPolicy</a></h2>
+			<pre>type FlowControlPolicy interface {
+    NewFlowSender(ch Channel, args ...interface{}) (FlowSender, error)
+    NewFlowRecver(ch Channel, ack func(int), args ...interface{}) (FlowRecver, error)
+    <span class="comment">//Stringer interface, return name of FlowControlPolicy</span>
+    String() string
+}</pre>
+			<p>
+FlowControlPolicy: implement diff flow control protocols.
+a flow control protocol has two parts:
+</p>
+<pre>sender: which send msgs and recv acks from recver.
+recver: which recv msgs and send acks to sender.
+</pre>
+<p>
+So besides wrapping a transport Channel (for send/recv msgs)
+</p>
+<pre>FlowSender expose Ack(int) method to recv acks
+FlowRecver constructor will take as argument a ack(int) callback for sending acks.
+</pre>
+<p>
+The following Windowing and XOnOff protocols are copied from Chapter 4 of
+&#34;Design And Validation Of Computer Protocols&#34; by Gerard J. Holzmann.
+</p>
+
+
+			
+
+			
+				<pre>var WindowFlowController FlowControlPolicy = WindowFlowControlPolicy(0)</pre>
+				
+			
+				<pre>var XOnOffFlowController FlowControlPolicy = &amp;XOnOffFlowControlPolicy{0.75, 0.25}</pre>
+				
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="FlowRecver">type <a href="/target/flowctrl.go?s=1016:1054#L28">FlowRecver</a></h2>
+			<pre>type FlowRecver interface {
+    Channel
+}</pre>
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="FlowSender">type <a href="/target/flowctrl.go?s=966:1014#L23">FlowSender</a></h2>
+			<pre>type FlowSender interface {
+    Channel
+    Ack(int)
+}</pre>
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="Id">type <a href="/target/id.go?s=1481:2155#L54">Id</a></h2>
+			<pre>type Id interface {
+    <span class="comment">//methods to query Id content</span>
+    Scope() int
+    Member() int
+
+    <span class="comment">//key value for storing Id in map</span>
+    Key() interface{}
+
+    <span class="comment">//for id matching</span>
+    Match(Id) bool
+    MatchType() MatchType
+
+    <span class="comment">//Generators for creating other ids of same type. Since often we don&#39;t</span>
+    <span class="comment">//know the exact types of Id.Val, so we have to create new ones from an existing id</span>
+    SysID(int, ...int) (Id, error) <span class="comment">//generate sys ids, also called as method of Router</span>
+    SysIdIndex() int               <span class="comment">//return (0 - NumSysInternalIds) for SysIds, return -1 for others</span>
+    Clone(...int) (Id, error)
+
+    <span class="comment">//Stringer interface</span>
+    String() string
+}</pre>
+			<p>
+Id defines the common interface shared by all kinds of ids: integers/strings/pathnames...
+</p>
+
+
+			
+
+			
+				<pre>var (
+    DummyIntId  Id = &amp;IntId{Val: -10201}
+    DummyStrId  Id = &amp;StrId{Val: &#34;-10201&#34;}
+    DummyPathId Id = &amp;PathId{Val: &#34;-10201&#34;}
+    DummyMsgId  Id = &amp;MsgId{Val: MsgTag{-10201, -10201}}
+)</pre>
+				<p>
+Some dummy ids, often used as seedId when creating router
+</p>
+
+			
+
+			
+
+			
+				
+				<h3 id="IntID">func <a href="/target/id.go?s=10546:10580#L434">IntID</a></h3>
+				<pre>func IntID(args ...interface{}) Id</pre>
+				<p>
+IntId constructor, accepting the following arguments:
+Val       int
+ScopeVal  int
+MemberVal int
+</p>
+
+				
+			
+				
+				<h3 id="MsgID">func <a href="/target/id.go?s=12186:12220#L543">MsgID</a></h3>
+				<pre>func MsgID(args ...interface{}) Id</pre>
+				<p>
+MsgId constructor, accepting the following arguments:
+Family    int
+Tag       int
+ScopeVal  int
+MemberVal int
+</p>
+
+				
+			
+				
+				<h3 id="PathID">func <a href="/target/id.go?s=11618:11653#L505">PathID</a></h3>
+				<pre>func PathID(args ...interface{}) Id</pre>
+				<p>
+PathId constructor, accepting the following arguments:
+Val       string (path names, such as /sport/basketball/news/...)
+ScopeVal  int
+MemberVal int
+</p>
+
+				
+			
+				
+				<h3 id="StrID">func <a href="/target/id.go?s=11035:11069#L468">StrID</a></h3>
+				<pre>func StrID(args ...interface{}) Id</pre>
+				<p>
+StrId constructor, accepting the following arguments:
+Val       string
+ScopeVal  int
+MemberVal int
+</p>
+
+				
+			
+
+			
+		
+			
+			
+			<h2 id="IdFilter">type <a href="/target/filtrans.go?s=630:702#L10">IdFilter</a></h2>
+			<pre>type IdFilter interface {
+    BlockInward(Id) bool
+    BlockOutward(Id) bool
+}</pre>
+			<p>
+IdFilter: the common interface of filters. concrete filters
+should be defined by apps with app-specific rules.
+if no filter defined, there is no id filtering.
+1. bound with specific proxy
+2. defines which ids can pass in / out to router thru this proxy
+3. only filter the ids of application msgs (NOT system msgs),
+only involved in processing namespace change msgs: PubId/SubId
+4. by default, if no filter is defined, everything is allowed
+5. filters are used against ids in local namespace, not translated ones
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="IdTranslator">type <a href="/target/filtrans.go?s=1280:1360#L26">IdTranslator</a></h2>
+			<pre>type IdTranslator interface {
+    TranslateInward(Id) Id
+    TranslateOutward(Id) Id
+}</pre>
+			<p>
+IdTransltor: the common interface of translators.
+concrete transltors should be defined by apps with app-specific rules.
+if no translator defined, there is no id transltions.
+1. bound with specific proxy
+2. translate ids of in / out msgs thru this proxy, effectively &#34;mount&#34; the msgs
+thru this proxy / conn to a subrange of router&#39;s id space
+3. only translate the ids of application msgs (NOT system msgs), and it will affect the
+ids of every app msgs passed thru this proxy - must be highly efficient
+4. by default, if no translator is defined, no translation
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="IntId">type <a href="/target/id.go?s=3616:3682#L129">IntId</a></h2>
+			<pre>type IntId struct {
+    Val       int
+    ScopeVal  int
+    MemberVal int
+}</pre>
+			<p>
+Use integer as ids in router
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="IntId.Clone">func (IntId) <a href="/target/id.go?s=3684:3739#L135">Clone</a></h3>
+				<pre>func (id IntId) Clone(args ...int) (nnid Id, err error)</pre>
+				
+				
+				
+			
+				
+				<h3 id="IntId.Key">func (IntId) <a href="/target/id.go?s=3938:3971#L148">Key</a></h3>
+				<pre>func (id IntId) Key() interface{}</pre>
+				
+				
+				
+			
+				
+				<h3 id="IntId.Match">func (IntId) <a href="/target/id.go?s=3991:4026#L150">Match</a></h3>
+				<pre>func (id1 IntId) Match(id2 Id) bool</pre>
+				
+				
+				
+			
+				
+				<h3 id="IntId.MatchType">func (IntId) <a href="/target/id.go?s=4111:4148#L157">MatchType</a></h3>
+				<pre>func (id IntId) MatchType() MatchType</pre>
+				
+				
+				
+			
+				
+				<h3 id="IntId.Member">func (IntId) <a href="/target/id.go?s=4224:4252#L160">Member</a></h3>
+				<pre>func (id IntId) Member() int</pre>
+				
+				
+				
+			
+				
+				<h3 id="IntId.Scope">func (IntId) <a href="/target/id.go?s=4172:4199#L159">Scope</a></h3>
+				<pre>func (id IntId) Scope() int</pre>
+				
+				
+				
+			
+				
+				<h3 id="IntId.String">func (IntId) <a href="/target/id.go?s=4277:4308#L161">String</a></h3>
+				<pre>func (id IntId) String() string</pre>
+				
+				
+				
+			
+				
+				<h3 id="IntId.SysID">func (IntId) <a href="/target/id.go?s=4496:4561#L166">SysID</a></h3>
+				<pre>func (id IntId) SysID(indx int, args ...int) (ssid Id, err error)</pre>
+				
+				
+				
+			
+				
+				<h3 id="IntId.SysIdIndex">func (IntId) <a href="/target/id.go?s=4818:4850#L182">SysIdIndex</a></h3>
+				<pre>func (id IntId) SysIdIndex() int</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="LogPriority">type <a href="/target/logfault.go?s=1253:1273#L26">LogPriority</a></h2>
+			<pre>type LogPriority int</pre>
+			
+
+			
+				<pre>const (
+    LOG_INFO LogPriority = iota
+    LOG_DEBUG
+    LOG_WARN
+    LOG_ERROR
+)</pre>
+				
+			
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="LogPriority.String">func (LogPriority) <a href="/target/logfault.go?s=1347:1384#L35">String</a></h3>
+				<pre>func (lp LogPriority) String() string</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="LogRecord">type <a href="/target/logfault.go?s=1605:1711#L50">LogRecord</a></h2>
+			<pre>type LogRecord struct {
+    Pri       LogPriority
+    Source    string
+    Info      interface{}
+    Timestamp int64
+}</pre>
+			<p>
+LogRecord stores the log information
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="LogSink">type <a href="/target/logfault.go?s=3820:3919#L150">LogSink</a></h2>
+			<pre>type LogSink struct {
+    <span class="comment">// contains filtered or unexported fields</span>
+}</pre>
+			<p>
+A simple log sink, showing log messages in console.
+</p>
+
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="NewLogSink">func <a href="/target/logfault.go?s=3996:4037#L158">NewLogSink</a></h3>
+				<pre>func NewLogSink(id Id, r Router) *LogSink</pre>
+				<p>
+create a new log sink, which receives log messages from id in router &#34;r&#34;
+</p>
+
+				
+			
+
+			
+				
+				<h3 id="LogSink.Close">func (*LogSink) <a href="/target/logfault.go?s=4263:4288#L169">Close</a></h3>
+				<pre>func (l *LogSink) Close()</pre>
+				
+				
+				
+			
+				
+				<h3 id="LogSink.Init">func (*LogSink) <a href="/target/logfault.go?s=4075:4123#L160">Init</a></h3>
+				<pre>func (l *LogSink) Init(id Id, r Router) *LogSink</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Logger">type <a href="/target/logfault.go?s=2827:2897#L100">Logger</a></h2>
+			<pre>type Logger struct {
+    sync.Mutex
+    <span class="comment">// contains filtered or unexported fields</span>
+}</pre>
+			<p>
+Logger can be embedded into user structs / types, which then can use Log() / LogError() directly
+</p>
+
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="NewLogger">func <a href="/target/logfault.go?s=2986:3037#L107">NewLogger</a></h3>
+				<pre>func NewLogger(id Id, r Router, src string) *Logger</pre>
+				<p>
+NewLogger will create a Logger object which sends log messages thru id in router &#34;r&#34;
+</p>
+
+				
+			
+
+			
+				
+				<h3 id="Logger.Close">func (*Logger) <a href="/target/logfault.go?s=3289:3313#L121">Close</a></h3>
+				<pre>func (l *Logger) Close()</pre>
+				
+				
+				
+			
+				
+				<h3 id="Logger.Init">func (*Logger) <a href="/target/logfault.go?s=3080:3138#L111">Init</a></h3>
+				<pre>func (l *Logger) Init(id Id, r Router, src string) *Logger</pre>
+				
+				
+				
+			
+				
+				<h3 id="Logger.Log">func (*Logger) <a href="/target/logfault.go?s=3459:3511#L132">Log</a></h3>
+				<pre>func (l *Logger) Log(p LogPriority, msg interface{})</pre>
+				<p>
+send a log record to log id in router
+</p>
+
+				
+				
+			
+				
+				<h3 id="Logger.LogError">func (*Logger) <a href="/target/logfault.go?s=3640:3676#L141">LogError</a></h3>
+				<pre>func (l *Logger) LogError(err error)</pre>
+				<p>
+send a log record and store error info in it
+</p>
+
+				
+				
+			
+		
+			
+			
+			<h2 id="Marshaler">type <a href="/target/marshaler.go?s=259:315#L9">Marshaler</a></h2>
+			<pre>type Marshaler interface {
+    Marshal(interface{}) error
+}</pre>
+			<p>
+the common interface of all marshaler such as GobMarshaler and JsonMarshaler
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="MarshalingPolicy">type <a href="/target/marshaler.go?s=553:685#L19">MarshalingPolicy</a></h2>
+			<pre>type MarshalingPolicy interface {
+    NewMarshaler(io.Writer) Marshaler
+    NewDemarshaler(io.Reader) Demarshaler
+    Register(interface{})
+}</pre>
+			<p>
+the common interface of all Marshaling policy such as GobMarshaling and JsonMarshaling
+</p>
+
+
+			
+
+			
+				<pre>var GobMarshaling MarshalingPolicy = &amp;gobMarshalingPolicy{registry: make(map[interface{}]bool)}</pre>
+				<p>
+use package &#34;gob&#34; for marshaling
+</p>
+
+			
+				<pre>var JsonMarshaling MarshalingPolicy = jsonMarshalingPolicy(1)</pre>
+				<p>
+use package &#34;json&#34; for marshaling
+</p>
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="MatchType">type <a href="/target/id.go?s=1244:1262#L45">MatchType</a></h2>
+			<pre>type MatchType int</pre>
+			<p>
+MatchType describes the types of namespaces and match algorithms used for id-matching
+</p>
+
+
+			
+				<pre>const (
+    ExactMatch  MatchType = iota
+    PrefixMatch           <span class="comment">// for PathId</span>
+    AssocMatch            <span class="comment">// for RegexId, TupleId</span>
+)</pre>
+				
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="MsgId">type <a href="/target/id.go?s=8690:8759#L352">MsgId</a></h2>
+			<pre>type MsgId struct {
+    Val       MsgTag
+    ScopeVal  int
+    MemberVal int
+}</pre>
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="MsgId.Clone">func (MsgId) <a href="/target/id.go?s=8761:8816#L358">Clone</a></h3>
+				<pre>func (id MsgId) Clone(args ...int) (nnid Id, err error)</pre>
+				
+				
+				
+			
+				
+				<h3 id="MsgId.Key">func (MsgId) <a href="/target/id.go?s=9015:9048#L371">Key</a></h3>
+				<pre>func (id MsgId) Key() interface{}</pre>
+				
+				
+				
+			
+				
+				<h3 id="MsgId.Match">func (MsgId) <a href="/target/id.go?s=9077:9112#L373">Match</a></h3>
+				<pre>func (id1 MsgId) Match(id2 Id) bool</pre>
+				
+				
+				
+			
+				
+				<h3 id="MsgId.MatchType">func (MsgId) <a href="/target/id.go?s=9244:9281#L381">MatchType</a></h3>
+				<pre>func (id MsgId) MatchType() MatchType</pre>
+				
+				
+				
+			
+				
+				<h3 id="MsgId.Member">func (MsgId) <a href="/target/id.go?s=9357:9385#L384">Member</a></h3>
+				<pre>func (id MsgId) Member() int</pre>
+				
+				
+				
+			
+				
+				<h3 id="MsgId.Scope">func (MsgId) <a href="/target/id.go?s=9305:9332#L383">Scope</a></h3>
+				<pre>func (id MsgId) Scope() int</pre>
+				
+				
+				
+			
+				
+				<h3 id="MsgId.String">func (MsgId) <a href="/target/id.go?s=9410:9441#L385">String</a></h3>
+				<pre>func (id MsgId) String() string</pre>
+				
+				
+				
+			
+				
+				<h3 id="MsgId.SysID">func (MsgId) <a href="/target/id.go?s=9648:9713#L390">SysID</a></h3>
+				<pre>func (id MsgId) SysID(indx int, args ...int) (ssid Id, err error)</pre>
+				
+				
+				
+			
+				
+				<h3 id="MsgId.SysIdIndex">func (MsgId) <a href="/target/id.go?s=9999:10031#L408">SysIdIndex</a></h3>
+				<pre>func (id MsgId) SysIdIndex() int</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="MsgTag">type <a href="/target/id.go?s=8463:8606#L345">MsgTag</a></h2>
+			<pre>type MsgTag struct {
+    Family int <span class="comment">//divide all msgs into families: system, fault, provision,...</span>
+    Tag    int <span class="comment">//further division inside a family</span>
+}</pre>
+			<p>
+Use a common msgTag as Id
+</p>
+
+
+			
+
+			
+				<pre>var MsgSysIdBase MsgTag = MsgTag{-10101, -10101} <span class="comment">//Base value for SysIds of MsgId</span>
+</pre>
+				<p>
+define 8 system msg ids
+</p>
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="MsgTag.String">func (MsgTag) <a href="/target/id.go?s=8608:8639#L350">String</a></h3>
+				<pre>func (t MsgTag) String() string</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="PathId">type <a href="/target/id.go?s=6515:6585#L256">PathId</a></h2>
+			<pre>type PathId struct {
+    Val       string
+    ScopeVal  int
+    MemberVal int
+}</pre>
+			<p>
+Use file-system like pathname as ids
+PathId has diff Match() algo from StrId
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="PathId.Clone">func (PathId) <a href="/target/id.go?s=6587:6643#L262">Clone</a></h3>
+				<pre>func (id PathId) Clone(args ...int) (nnid Id, err error)</pre>
+				
+				
+				
+			
+				
+				<h3 id="PathId.Key">func (PathId) <a href="/target/id.go?s=6843:6877#L275">Key</a></h3>
+				<pre>func (id PathId) Key() interface{}</pre>
+				
+				
+				
+			
+				
+				<h3 id="PathId.Match">func (PathId) <a href="/target/id.go?s=6897:6933#L277">Match</a></h3>
+				<pre>func (id1 PathId) Match(id2 Id) bool</pre>
+				
+				
+				
+			
+				
+				<h3 id="PathId.MatchType">func (PathId) <a href="/target/id.go?s=7467:7505#L309">MatchType</a></h3>
+				<pre>func (id PathId) MatchType() MatchType</pre>
+				
+				
+				
+			
+				
+				<h3 id="PathId.Member">func (PathId) <a href="/target/id.go?s=7583:7612#L312">Member</a></h3>
+				<pre>func (id PathId) Member() int</pre>
+				
+				
+				
+			
+				
+				<h3 id="PathId.Scope">func (PathId) <a href="/target/id.go?s=7530:7558#L311">Scope</a></h3>
+				<pre>func (id PathId) Scope() int</pre>
+				
+				
+				
+			
+				
+				<h3 id="PathId.String">func (PathId) <a href="/target/id.go?s=7637:7669#L313">String</a></h3>
+				<pre>func (id PathId) String() string</pre>
+				
+				
+				
+			
+				
+				<h3 id="PathId.SysID">func (PathId) <a href="/target/id.go?s=7864:7930#L318">SysID</a></h3>
+				<pre>func (id PathId) SysID(indx int, args ...int) (ssid Id, err error)</pre>
+				
+				
+				
+			
+				
+				<h3 id="PathId.SysIdIndex">func (PathId) <a href="/target/id.go?s=8209:8242#L334">SysIdIndex</a></h3>
+				<pre>func (id PathId) SysIdIndex() int</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="PolicyFunc">type <a href="/target/dispatcher.go?s=961:994#L30">PolicyFunc</a></h2>
+			<pre>type PolicyFunc func() Dispatcher</pre>
+			
+
+			
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="PolicyFunc.NewDispatcher">func (PolicyFunc) <a href="/target/dispatcher.go?s=996:1042#L32">NewDispatcher</a></h3>
+				<pre>func (f PolicyFunc) NewDispatcher() Dispatcher</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Proxy">type <a href="/target/proxy.go?s=737:1300#L17">Proxy</a></h2>
+			<pre>type Proxy interface {
+    <span class="comment">//Connect to a local router</span>
+    Connect(Proxy) error
+    <span class="comment">//Connect to a remote router thru io conn</span>
+    <span class="comment">//1. io.ReadWriteCloser: transport connection</span>
+    <span class="comment">//2. MarshalingPolicy: gob or json marshaling</span>
+    <span class="comment">//3. remaining args can be a FlowControlPolicy (e.g. window based or XOnOff)</span>
+    ConnectRemote(io.ReadWriteCloser, MarshalingPolicy, ...interface{}) error
+    <span class="comment">//close proxy and disconnect from peer</span>
+    Close()
+    <span class="comment">//query messaging interface with peer</span>
+    LocalPubInfo() []*ChanInfo
+    LocalSubInfo() []*ChanInfo
+    PeerPubInfo() []*ChanInfo
+    PeerSubInfo() []*ChanInfo
+}</pre>
+			<p>
+Proxy is the primary interface to connect router to its peer router.
+At both ends of a connection, there is a proxy object for its router.
+Simple router connection can be set up thru calling Router.Connect().
+Proxy.Connect() can be used to set up more complicated connections,
+such as setting IdFilter to allow only a subset of messages pass thru
+the connection, or setting IdTranslator which can &#34;relocate&#34; remote message
+ids into a subspace in local router&#39;s namespace, or setting a flow control policy.
+Proxy.Close() is called to disconnect router from its peer.
+</p>
+
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="NewProxy">func <a href="/target/proxy.go?s=3113:3183#L86">NewProxy</a></h3>
+				<pre>func NewProxy(r Router, name string, f IdFilter, t IdTranslator) Proxy</pre>
+				<p>
+Proxy constructor. It accepts the following arguments:
+</p>
+<pre>1. r:    the router which will be bound with this proxy and be owner of this proxy
+2. name: proxy&#39;s name, used in log messages if owner router&#39;s log is turned on
+3. f:    IdFilter to be installed at this proxy
+4. t:    IdTranslator to be installed at this proxy
+</pre>
+
+				
+			
+
+			
+		
+			
+			
+			<h2 id="RandomDispatcher">type <a href="/target/dispatcher.go?s=2500:2531#L86">RandomDispatcher</a></h2>
+			<pre>type RandomDispatcher rand.Rand</pre>
+			<p>
+Random dispatcher
+</p>
+
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="NewRandomDispatcher">func <a href="/target/dispatcher.go?s=2533:2577#L88">NewRandomDispatcher</a></h3>
+				<pre>func NewRandomDispatcher() *RandomDispatcher</pre>
+				
+				
+			
+
+			
+				
+				<h3 id="RandomDispatcher.Dispatch">func (*RandomDispatcher) <a href="/target/dispatcher.go?s=2660:2736#L92">Dispatch</a></h3>
+				<pre>func (rd *RandomDispatcher) Dispatch(v reflect.Value, recvers []*RoutedChan)</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="RecvChan">type <a href="/target/chans.go?s=1038:1084#L48">RecvChan</a></h2>
+			<pre>type RecvChan interface {
+    ChanState
+    Recver
+}</pre>
+			<p>
+RecvChan: recving end of Channel (&lt;-chan)
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="Recver">type <a href="/target/chans.go?s=681:769#L27">Recver</a></h2>
+			<pre>type Recver interface {
+    Recv() (reflect.Value, bool)
+    TryRecv() (reflect.Value, bool)
+}</pre>
+			<p>
+common interface for msg recvers
+recvers will check if channels are closed or not
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="Roundrobin">type <a href="/target/dispatcher.go?s=2014:2033#L64">Roundrobin</a></h2>
+			<pre>type Roundrobin int</pre>
+			<p>
+Roundrobin dispatcher will keep the &#34;next&#34; index as its state
+</p>
+
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="NewRoundrobin">func <a href="/target/dispatcher.go?s=2035:2067#L66">NewRoundrobin</a></h3>
+				<pre>func NewRoundrobin() *Roundrobin</pre>
+				
+				
+			
+
+			
+				
+				<h3 id="Roundrobin.Dispatch">func (*Roundrobin) <a href="/target/dispatcher.go?s=2096:2165#L68">Dispatch</a></h3>
+				<pre>func (r *Roundrobin) Dispatch(v reflect.Value, recvers []*RoutedChan)</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="RoutedChan">type <a href="/target/routedchan.go?s=674:1149#L31">RoutedChan</a></h2>
+			<pre>type RoutedChan struct {
+    Kind    ChanDirection
+    Id      Id
+    Channel <span class="comment">//external SendChan/RecvChan, attached by clients</span>
+    <span class="comment">// contains filtered or unexported fields</span>
+}</pre>
+			<p>
+RoutedChan represents channels which are attached to router.
+They expose Channel&#39;s interface: Send()/TrySend()/Recv()/TryRecv()/...
+and additional info:
+</p>
+<pre>1. Id - the id which channel is attached to
+2. NumPeers() - return the number of bound peers
+3. Peers() - array of bound peers RoutedChan
+4. Detach() - detach the channel from router
+</pre>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="RoutedChan.Close">func (*RoutedChan) <a href="/target/routedchan.go?s=1557:1585#L65">Close</a></h3>
+				<pre>func (e *RoutedChan) Close()</pre>
+				<p>
+override Channel.Close() method
+</p>
+
+				
+				
+			
+				
+				<h3 id="RoutedChan.Detach">func (*RoutedChan) <a href="/target/routedchan.go?s=3600:3629#L169">Detach</a></h3>
+				<pre>func (e *RoutedChan) Detach()</pre>
+				
+				
+				
+			
+				
+				<h3 id="RoutedChan.Interface">func (*RoutedChan) <a href="/target/routedchan.go?s=1463:1507#L60">Interface</a></h3>
+				<pre>func (e *RoutedChan) Interface() interface{}</pre>
+				
+				
+				
+			
+				
+				<h3 id="RoutedChan.NumPeers">func (*RoutedChan) <a href="/target/routedchan.go?s=1996:2031#L81">NumPeers</a></h3>
+				<pre>func (e *RoutedChan) NumPeers() int</pre>
+				
+				
+				
+			
+				
+				<h3 id="RoutedChan.Peers">func (*RoutedChan) <a href="/target/routedchan.go?s=2253:2305#L97">Peers</a></h3>
+				<pre>func (e *RoutedChan) Peers() (copySet []*RoutedChan)</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Router">type <a href="/target/router.go?s=1291:3258#L37">Router</a></h2>
+			<pre>type Router interface {
+    <span class="comment">//---- core api ----</span>
+    <span class="comment">//Attach chans to id in router, with an optional argument (chan *BindEvent)</span>
+    <span class="comment">//When specified, the optional argument will serve two purposes:</span>
+    <span class="comment">//1. used to tell when the remote peers connecting/disconn</span>
+    <span class="comment">//2. in AttachRecvChan, used as a flag to ask router to keep recv chan open when all senders close</span>
+    <span class="comment">//the returned RoutedChan object can be used to find the number of bound peers: routCh.NumPeers()</span>
+    AttachSendChan(Id, interface{}, ...interface{}) (*RoutedChan, error)
+    <span class="comment">//3. When attaching recv chans, an optional integer can specify the internal buffering size</span>
+    AttachRecvChan(Id, interface{}, ...interface{}) (*RoutedChan, error)
+
+    <span class="comment">//Detach sendChan/recvChan from router</span>
+    DetachChan(Id, interface{}) error
+
+    <span class="comment">//Shutdown router, and close attached proxies and chans</span>
+    Close()
+
+    <span class="comment">//Connect to a local router</span>
+    Connect(Router) (Proxy, Proxy, error)
+
+    <span class="comment">//Connect to a remote router thru io conn</span>
+    <span class="comment">//1. io.ReadWriteCloser: transport connection</span>
+    <span class="comment">//2. MarshalingPolicy: gob or json marshaling</span>
+    <span class="comment">//3. remaining args can be a FlowControlPolicy (e.g. window based or XOnOff)</span>
+    ConnectRemote(io.ReadWriteCloser, MarshalingPolicy, ...interface{}) (Proxy, error)
+
+    <span class="comment">//--- other utils ---</span>
+    <span class="comment">//return pre-created SysIds according to the router&#39;s id-type, with ScopeGlobal / MemberLocal</span>
+    SysID(idx int) Id
+
+    <span class="comment">//create a new SysId with &#34;args...&#34; specifying scope/membership</span>
+    NewSysID(idx int, args ...int) Id
+
+    <span class="comment">//return all ids and their ChanTypes from router&#39;s namespace which satisfy predicate</span>
+    IdsForSend(predicate func(id Id) bool) map[interface{}]*ChanInfo
+    IdsForRecv(predicate func(id Id) bool) map[interface{}]*ChanInfo
+}</pre>
+			<p>
+Router is the main access point to functionality. Applications will create an instance
+of it thru router.New(...) and attach channels to it
+</p>
+
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="New">func <a href="/target/router.go?s=18124:18205#L663">New</a></h3>
+				<pre>func New(seedId Id, bufSize int, disp DispatchPolicy, args ...interface{}) Router</pre>
+				<p>
+New is router constructor. It accepts the following arguments:
+</p>
+<pre>1. seedId: a dummy id to show what type of ids will be used. New ids will be type-checked against this.
+2. bufSize: the buffer size used for router&#39;s internal channels.
+   if bufSize &gt;= 0, its value will be used
+   if bufSize &lt; 0, it means unlimited buffering, so router is async and sending on attached channels will never block
+3. disp: dispatch policy for router. by default, it is BroadcastPolicy
+4. optional arguments ...:
+   name:     router&#39;s name, if name is defined, router internal logging will be turned on, ie LogRecord generated
+   LogScope: if this is set, a console log sink is installed to show router internal log
+      if logScope == ScopeLocal, only log msgs from local router will show up
+      if logScope == ScopeGlobal, all log msgs from connected routers will show up
+</pre>
+
+				
+			
+
+			
+		
+			
+			
+			<h2 id="SendChan">type <a href="/target/chans.go?s=946:992#L42">SendChan</a></h2>
+			<pre>type SendChan interface {
+    ChanState
+    Sender
+}</pre>
+			<p>
+SendChan: sending end of Channel (chan&lt;-)
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="Sender">type <a href="/target/chans.go?s=509:593#L19">Sender</a></h2>
+			<pre>type Sender interface {
+    Send(reflect.Value)
+    TrySend(reflect.Value) bool
+    Close()
+}</pre>
+			<p>
+common interface for msg senders
+and senders are responsible for closing channels
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="StrId">type <a href="/target/id.go?s=4986:5055#L191">StrId</a></h2>
+			<pre>type StrId struct {
+    Val       string
+    ScopeVal  int
+    MemberVal int
+}</pre>
+			<p>
+Use strings as ids in router
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="StrId.Clone">func (StrId) <a href="/target/id.go?s=5057:5112#L197">Clone</a></h3>
+				<pre>func (id StrId) Clone(args ...int) (nnid Id, err error)</pre>
+				
+				
+				
+			
+				
+				<h3 id="StrId.Key">func (StrId) <a href="/target/id.go?s=5311:5344#L210">Key</a></h3>
+				<pre>func (id StrId) Key() interface{}</pre>
+				
+				
+				
+			
+				
+				<h3 id="StrId.Match">func (StrId) <a href="/target/id.go?s=5364:5399#L212">Match</a></h3>
+				<pre>func (id1 StrId) Match(id2 Id) bool</pre>
+				
+				
+				
+			
+				
+				<h3 id="StrId.MatchType">func (StrId) <a href="/target/id.go?s=5484:5521#L219">MatchType</a></h3>
+				<pre>func (id StrId) MatchType() MatchType</pre>
+				
+				
+				
+			
+				
+				<h3 id="StrId.Member">func (StrId) <a href="/target/id.go?s=5597:5625#L222">Member</a></h3>
+				<pre>func (id StrId) Member() int</pre>
+				
+				
+				
+			
+				
+				<h3 id="StrId.Scope">func (StrId) <a href="/target/id.go?s=5545:5572#L221">Scope</a></h3>
+				<pre>func (id StrId) Scope() int</pre>
+				
+				
+				
+			
+				
+				<h3 id="StrId.String">func (StrId) <a href="/target/id.go?s=5650:5681#L223">String</a></h3>
+				<pre>func (id StrId) String() string</pre>
+				
+				
+				
+			
+				
+				<h3 id="StrId.SysID">func (StrId) <a href="/target/id.go?s=5874:5939#L228">SysID</a></h3>
+				<pre>func (id StrId) SysID(indx int, args ...int) (ssid Id, err error)</pre>
+				
+				
+				
+			
+				
+				<h3 id="StrId.SysIdIndex">func (StrId) <a href="/target/id.go?s=6210:6242#L244">SysIdIndex</a></h3>
+				<pre>func (id StrId) SysIdIndex() int</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="WindowFlowControlPolicy">type <a href="/target/flowctrl.go?s=1260:1293#L37">WindowFlowControlPolicy</a></h2>
+			<pre>type WindowFlowControlPolicy byte</pre>
+			<p>
+WindowFlowController: simple window flow control protocol for lossless transport
+the transport Channel between Sender, Recver should have capacity &gt;= expected credit
+Figure 4.5 in Gerard&#39;s book
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="WindowFlowControlPolicy.NewFlowRecver">func (WindowFlowControlPolicy) <a href="/target/flowctrl.go?s=2027:2143#L61">NewFlowRecver</a></h3>
+				<pre>func (wfc WindowFlowControlPolicy) NewFlowRecver(ch Channel, ack func(int), args ...interface{}) (FlowRecver, error)</pre>
+				
+				
+				
+			
+				
+				<h3 id="WindowFlowControlPolicy.NewFlowSender">func (WindowFlowControlPolicy) <a href="/target/flowctrl.go?s=1368:1469#L41">NewFlowSender</a></h3>
+				<pre>func (wfc WindowFlowControlPolicy) NewFlowSender(ch Channel, args ...interface{}) (FlowSender, error)</pre>
+				
+				
+				
+			
+				
+				<h3 id="WindowFlowControlPolicy.String">func (WindowFlowControlPolicy) <a href="/target/flowctrl.go?s=2193:2243#L65">String</a></h3>
+				<pre>func (wfc WindowFlowControlPolicy) String() string</pre>
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="XOnOffFlowControlPolicy">type <a href="/target/flowctrl.go?s=3735:3800#L151">XOnOffFlowControlPolicy</a></h2>
+			<pre>type XOnOffFlowControlPolicy struct {
+    <span class="comment">// contains filtered or unexported fields</span>
+}</pre>
+			<p>
+X-on/X-off protocol
+Figure 4.2 and Figure 4.3 in Gerard&#39;s book
+</p>
+
+
+			
+
+			
+
+			
+
+			
+
+			
+				
+				<h3 id="XOnOffFlowControlPolicy.NewFlowRecver">func (*XOnOffFlowControlPolicy) <a href="/target/flowctrl.go?s=4111:4228#L166">NewFlowRecver</a></h3>
+				<pre>func (fcp *XOnOffFlowControlPolicy) NewFlowRecver(ch Channel, ack func(int), args ...interface{}) (FlowRecver, error)</pre>
+				
+				
+				
+			
+				
+				<h3 id="XOnOffFlowControlPolicy.NewFlowSender">func (*XOnOffFlowControlPolicy) <a href="/target/flowctrl.go?s=3885:3987#L158">NewFlowSender</a></h3>
+				<pre>func (fcp *XOnOffFlowControlPolicy) NewFlowSender(ch Channel, args ...interface{}) (FlowSender, error)</pre>
+				
+				
+				
+			
+				
+				<h3 id="XOnOffFlowControlPolicy.String">func (*XOnOffFlowControlPolicy) <a href="/target/flowctrl.go?s=4639:4690#L181">String</a></h3>
+				<pre>func (fcp *XOnOffFlowControlPolicy) String() string</pre>
+				
+				
+				
+			
+		
+		</div>
+	
+
+	
+
+
+
+
+
+
+

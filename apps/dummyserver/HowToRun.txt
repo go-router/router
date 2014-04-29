@@ -1,0 +1,42 @@
+
+1> in one console, run "./server" to start the server
+2> in 2nd console, run "./client news 1234" to start a client to talk to "news" service in server for 1234 times
+3> in 3rd console, run "./client stock 1234" to start a client to talk to "stock" service in server for 1234 times
+4> observe the trace messages in server console, see how the standby servant will come up automatically when active servant goes out of service:
+"...
+App Service [ news ] at [ servant1 ] process req:  request 1616
+App Service [ stock ] at [ servant1 ] process req:  request 1822
+App Service [ stock ] at [ servant1 ] process req:  request 1823
+DbTask at [ servant1 ] handles req from :  stock
+DbTask at [ servant1 ] report fault
+fault manager at [ servant1 ] report OOS
+xxxx Servant [ servant1 ] will take a break and standby ...
+App Service [ stock ] at [ servant1 ] is stopped
+servant1  enter monitor heartbeat
+App Service [ news ] at [ servant1 ] is stopped
+servant1  exit send heartbeat
+servant2  exit monitor heartbeat
+!!!! Servant [ servant2 ] come up in service ...
+servant2  enter send heartbeat
+App Service [ news ] at [ servant2 ] is activated
+App Service [ stock ] at [ servant2 ] is activated
+App Service [ stock ] at [ servant2 ] process req:  request 1824
+App Service [ stock ] at [ servant2 ] process req:  request 1825
+...
+"
+5> observe the trace messages in client console, see when servant fail-over/switch-over happens, the client may have one request timed out, then the responses will keep coming back, however from a different servant:
+"...
+client sent request [request 1822] to serivce [stock]
+client recv response ( [request 1822] is processed at [servant1] : transaction_id [4] )
+client sent request [request 1823] to serivce [stock]
+client recv response ( [request 1823] is processed at [servant1] : transaction_id [5] )
+client sent request [request 1824] to serivce [stock]
+time out for reqest [request 1824]
+client sent request [request 1824] to serivce [stock]
+client recv response ( [request 1824] is processed at [servant2] : transaction_id [4] )
+client sent request [request 1825] to serivce [stock]
+client recv response ( [request 1825] is processed at [servant2] : transaction_id [5] )
+
+...
+"
+  

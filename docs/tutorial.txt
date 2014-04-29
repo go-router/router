@@ -1,0 +1,186 @@
+        << router - A Go Package For Remote Channel Communication >>
+                         
+1. introduction
+
+"router" is a Go package for remote channel communication, based on peer-peer pub/sub model. 
+Basically we attach a send chan to an id in router to send msgs, and attach a recv chan to 
+an id to recv msgs. If these 2 ids match, the msgs from send chan will be "routed" to recv chan, e.g.
+
+   rot := router.New(...)
+   chan1 := make(chan string)
+   chan2 := make(chan string)
+   chan3 := make(chan string)
+   rot.AttachSendChan(PathID("/sports/basketball"), chan1)
+   rot.AttachRecvChan(PathID("/sports/basketball"), chan2)
+   rot.AttachRecvChan(PathID("/sports/*"), chan3)
+
+We can use integers, strings, pathnames, or structs as Ids in router (maybe regex ids
+and tuple id in future). 
+
+we can connect two routers so that chans attached to router1 can communicate with 
+chans attached to router2 transparently.
+
+2. API
+type Router interface {
+	//---- core api ----
+	//Attach chans to id in router, with an optional argument (chan *BindEvent)
+	//When specified, the optional argument will serve two purposes:
+	//1. used to tell when the remote peers connecting/disconn
+	//2. in AttachRecvChan, used as a flag to ask router to keep recv chan open when all senders close
+	//the returned RoutedChan object can be used to find the number of bound peers: routCh.NumPeers()
+	AttachSendChan(Id, interface{}, ...interface{}) (*RoutedChan, os.Error)
+	//3. When attaching recv chans, an optional integer can specify the internal buffering size
+	AttachRecvChan(Id, interface{}, ...interface{}) (*RoutedChan, os.Error)
+
+	//Detach sendChan/recvChan from router
+	DetachChan(Id, interface{}) os.Error
+
+	//Shutdown router
+	Close()
+
+	//Connect this router to another router.
+	//1. internally it calls Proxy.Connect(...) to do the real job
+	//2. The connection can be disconnected by calling Proxy.Close() on returned proxy object
+	//3. for more compilcated connection setup (such as setting IdFilter and IdTranslator), use Proxy.Connect() instead
+
+	//Connect to a local router
+	Connect(Router) (Proxy, Proxy, os.Error)
+
+	//Connect to a remote router thru io conn
+	//1. io.ReadWriteCloser: transport connection
+	//2. MarshalingPolicy: gob or json marshaling
+	//3. bool flag: turn on flow control on connection
+	ConnectRemote(io.ReadWriteCloser, MarshalingPolicy, ...bool) (Proxy, os.Error)
+
+	//--- other utils ---
+	//return pre-created SysIds according to the router's id-type, with ScopeGlobal / MemberLocal
+	SysID(idx int) Id
+
+	//create a new SysId with "args..." specifying scope/membership
+	NewSysID(idx int, args ...int) Id
+
+	//return all ids and their ChanTypes from router's namespace which satisfy predicate
+	IdsForSend(predicate func(id Id) bool) map[interface{}]*IdChanInfo
+	IdsForRecv(predicate func(id Id) bool) map[interface{}]*IdChanInfo
+}
+
+func router.New(seedId Id, bufSize int, disp DispatchPolicy, args ...) Router
+
+3. Id
+   Each id contains three pieces of data:
+   . Val - used as key in routing
+   . Scope - the scope to send/recv msgs
+   . Membership - local/remote peer, identifying if peers are inside same router or not
+   1> Scope
+      Scope defines the range of send/recv operations. there are three scopes:
+      ScopeLocal: send msgs to local peers in the same router, or recv msgs
+                  from local peers
+      ScopeRemote: send msgs to remote peers in connected routers, or
+                   recv msgs from remote peers
+      ScopeGlobal: send msgs to all local/remote peers, or recv msgs from
+                   all local/remote peers
+      the default attributes of id is ScopeGlobal (and Membership = MemberLocal)
+   2> matching algorithm
+      different types of ids use diff matching algorithms:
+      . exact match: for int/string/struct ids
+      . prefix match: for pathname ids
+      . assoc match: for regex ids or tuple ids (future)
+   3> binding
+      When send/recv chans are attached to router, their ids are matched against ids of chans
+      which are already attached, and their bindings will be decided:
+      For send chan, its bindings is the set of recv chans with matched id.
+      For recv chan, its bindings is the set of send chans with matched id.
+
+4. dispatchers
+   router is created with the following constructor:
+   rot := router.New(SeedId, chanBufSize, dispatchPolicy, ...)
+   dispatchPolicy defines how the values from a send chan are dispatched to
+   its bound recv chans. Three simple dispatchers can be used now: broadcast/round-robin/random.
+   need more work here.
+
+5. type-checking
+   When making changes to router's namespace (Attach/Detach/Connect), the types of
+   ids and chans are checked during runtime
+   1> type checking inside a single router
+      when attaching/detaching chans to ids in router, verify that id is of same type of router's id type,
+      and if id is already inside router, verify added chan is of same type as chans already attached
+      to this id
+   2> type checking during router connection
+      when two routers are connected, verify they have the same id type, and if they have matching ids, 
+      verify matching ids have the same chan type in both routers 
+
+6. system ids and system services:
+   there are eight system ids:
+        ConnId
+	DisconnId
+	ErrorId
+	ReadyId
+	PubId
+	UnPubId
+	SubId
+	UnSubId
+   user code can subscribe (attach recv chan to) to the above ids
+   to learn system state changes and react accordingly
+
+   1> namespace monitoring
+      user code can track router's namespace change by subscribing (attach recv [chan IdChanInfo] to) 
+      these four system ids: PubId/UnPubId/SubId/UnSubId. then user code will recv msgs
+      when new chans are attached or existing chans are detached to router
+
+      user code can call router.IdsForSend(predicate)/IdsForRecv(predicate) to get
+      a snapshot of current router namespace
+      
+   2> connection monitoring
+      user code can track the connection status of its router to remote routers by subscribing
+      (attach recv [chan ConnInfoMsg]) to these four system ids: RouterConnId/RouterDisconnId/ConnErrorId/ConnReadyId
+
+   3> logging and Logger
+      besides the above eight core system ids, there are two other ids: RouterLogId and 	   	 RouterFaultId. They are normal ids and are predefined so that we can have logging and 
+      fault-reporting for router's internal implementation. Applications can define their 
+      own ids for app specific logging and fault reporting
+
+      to add logging to app code, embed Logger and use its two methods Log()/LogError().
+
+      to recv log msgs, attach a recv [chan *LogRecord] to RouterLogId or app specific log id. 
+      If attached to LogId with ScopeLocal, recv chan will recv log msgs from local router. 
+      If attached with ScopeGlobal, recv chan will also recv/pull log msgs from connected 
+      remote routers.
+
+      If no recv chan is attached to LogId, logging is disabled without any log msgs buffered
+
+   4> fault handling and FaultReporter
+      raising fault is basically sending FaultRecord msgs to RouterFaultId, or app specific 
+	fault id.
+
+      to add fault reporting to app code, embed FaultRaiser and use its method Raise().
+
+      to handle/manage faults, attach a recv [chan *FaultRecord] to FaultId. If attached 
+      to FaultId with ScopeLocal, recv chan will recv FaultRecord msgs from local router. 
+      If attached with ScopeGlobal, recv chan will also recv/pull FaultRecord msgs from 
+      connected remote routers.
+
+      If no recv chan is attached to FaultId, there is no fault handling. calling Raise() will
+      crash app.
+
+7. Connecting remote routers
+   1> marshaling
+      marshaling/demarshaling are exposed thru three interfaces: MarshalingPolicy/Marshaler/Demarshaler.
+      there are two implemetations: GobMarshaling using "gob" and JsonMarshaling using "json"
+
+   2> name-sapce merge protocol.
+      when two routers are connected, their namespaces are merged as following to enable chans in
+      one router to communicate to chans in the other router transparently:
+      . Ids merging from router2 to router1: 
+        all ids in the intersection of router1's input interface (its set of recv ids with global /
+            remote scope) and router2's output interface (its set of send ids with global / remote
+            scope)
+      . Ids merging from router1 to router2:
+        all ids in the intersection of router2's input interface (its set of recv ids with global /
+            remote scope) and router1's output interface (its set of send ids with global / remote
+            scope)
+      . new ids are propagated automatically to connected routers according to its id / scope / membership.
+      . when routers are disconnected, routers' namespaces will be updated automatically so that 
+        all publications and subscriptions from remote routers will be removed.
+
+8. Reference
+   http://channel.sourceforge.net
